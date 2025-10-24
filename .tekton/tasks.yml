@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: ci-pipeline
+spec:
+  workspaces:
+    - name: source
+      description: Workspace containing the source code
+  tasks:
+    - name: cleanup
+      taskRef:
+        name: cleanup
+      workspaces:
+        - name: source
+          workspace: source
+
+    - name: run-tests
+      runAfter:
+        - cleanup
+      taskRef:
+        name: nose
+      workspaces:
+        - name: source
+          workspace: source
+      params:
+        - name: args
+          value: "-v --with-spec --spec-color --with-coverage --cover-package=app"
